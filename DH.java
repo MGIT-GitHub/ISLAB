@@ -1,4 +1,5 @@
 import java.util.*;
+
 public class DH {
     // Function to compute (a^b) % p
     public static int power(int a, int b, int p) {
@@ -13,6 +14,20 @@ public class DH {
         }
         return result;
     }
+
+    // Function to check if a number is prime
+    public static boolean isPrime(int n) {
+        if (n <= 1) {
+            return false;
+        }
+        for (int i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // Function to check if a number is a primitive root
     public static boolean isPrimitiveRoot(int g, int p) {
         ArrayList<Integer> results = new ArrayList<>();
@@ -36,26 +51,62 @@ public class DH {
         }
         return primitiveRoots;
     }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter a prime number: ");
-        int p = scanner.nextInt();
-        ArrayList<Integer> primitiveRoots = findPrimitiveRoots(p);
-        System.out.println("Select primitiveRoots of "+p +"from below\n" + primitiveRoots);
-        //Defiee hellmen key exchangeint g=scanner.nextInt();
-        System.out.println("Give private key
         
-        of A & B: ");
-        int a=scanner.nextInt();
-        int b=scanner.nextInt();
-        int x=power(g,a,p);
-        int y=power(g,b,p);
-        int ka=power(y,a,p);
-        int kb=power(x,b,p);
-        System.out.println("Public key for A is : "+x);
-        System.out.println("Public key for B is : "+y);
-        System.out.println("Secret key for A is : "+ka);
-        System.out.println("Secret key for B is : "+kb);
+        // Case 1: Check if the input number is prime
+        System.out.print("Enter a prime number (q): ");
+        int p = scanner.nextInt();
+        if (!isPrime(p)) {
+            System.out.println(p + " is not a prime number.");
+            return;
+        }
+
+        // Case 2: List eligible primitive roots for the given input
+        ArrayList<Integer> primitiveRoots = findPrimitiveRoots(p);
+        System.out.println("Primitive roots of " + p + ": " + primitiveRoots);
+        if (primitiveRoots.isEmpty()) {
+            System.out.println("No primitive roots found for " + p);
+            return;
+        }
+        
+        // Choose a primitive root
+        System.out.print("Select a primitive root from the list: ");
+        int g = scanner.nextInt();
+        if (!primitiveRoots.contains(g)) {
+            System.out.println(g + " is not a valid primitive root.");
+            return;
+        }
+
+        // Perform Diffie-Hellman Key Exchange
+        System.out.print("Enter private key for A: ");
+        int a = scanner.nextInt();
+        System.out.print("Enter private key for B: ");
+        int b = scanner.nextInt();
+        
+        int x = power(g, a, p);
+        int y = power(g, b, p);
+        int ka = power(y, a, p);
+        int kb = power(x, b, p);
+        
+        System.out.println("Public key for A is: " + x);
+        System.out.println("Public key for B is: " + y);
+        System.out.println("Secret key for A is: " + ka);
+        System.out.println("Secret key for B is: " + kb);
+        
+        // Case 3: Perform encryption and decryption using calculated symmetric key
+        System.out.print("Enter the plain text (integer) to encrypt: ");
+        int plaintext = scanner.nextInt();
+        
+        // Encrypt
+        int encryptedText = plaintext + ka;
+        System.out.println("Encrypted text: " + encryptedText);
+        
+        // Decrypt
+        int decryptedText = encryptedText - kb;
+        System.out.println("Decrypted text: " + decryptedText);
+        
         scanner.close();
     }
 }
